@@ -1,6 +1,3 @@
-from faulthandler import disable
-from operator import index
-from numpy.core.fromnumeric import size
 import streamlit as st
 import pandas as pd
 import seaborn as sns
@@ -13,7 +10,6 @@ from streamlit_folium import folium_static
 from wordcloud import WordCloud
 from itertools import chain
 import collections
-import plotly.express as px
 
 @st.cache(hash_funcs={"MyUnhashableClass6": lambda _: None})
 def wordCloudEntidades(dataset):
@@ -69,7 +65,7 @@ def load_nomes_atracoes():
 
 @st.cache(hash_funcs={"MyUnhashableClass4": lambda _: None})
 def load_scores_sentencas():
-    return pd.read_csv('scores_sentencas_com_tamanho.csv')
+    return pd.read_csv('scores_sentencas.csv')
 
     
 df_todos = load_dataset()
@@ -119,50 +115,79 @@ def ano_mais_visitado():
     return ano_df_qtde['ano_data'][0]
 
 def sentencas_mais_positivas(n_top):
-    df_filtrado = df_scores_sentencas[(df_scores_sentencas.indice_comentario.isin(df.index.tolist())) & (df_scores_sentencas.tam_sentenca > 4)]
-    
-    df_ordenado_por_score = df_filtrado.sort_values(by='score_positivo',ascending=False).head(n_top)
+    df_filtrado = df_scores_sentencas[(df_scores_sentencas.indice_comentario.isin(df.index.tolist())) & (df_scores_sentencas.qtde_espacos > 4)]
+    #Adicionando uma margem de 10 sentenças para caso haja alguma repetida no top n
+    df_ordenado_por_score = df_filtrado.sort_values(by='score_positivo',ascending=False).head(n_top+10)
     html = ""
+    sentenca_anterior = ""
+    i = 0
     for sentenca in df_ordenado_por_score['sentenca']:
-        html = html + "* *"+sentenca+"*\n"
+        if (sentenca != sentenca_anterior):
+            html = html + "* *"+sentenca+"*\n"
+            i = i + 1
+        if (i == n_top):
+            break
+        sentenca_anterior = sentenca
     st.markdown(html)
 
 def sentencas_mais_positivas_localidade(n_top):
-    df_filtrado = df_scores_sentencas[(df_scores_sentencas.indice_comentario.isin(df.index.tolist())) & (df_scores_sentencas.tam_sentenca > 4)]
-    
-    df_ordenado_por_score = df_filtrado.sort_values(by='score_positivo',ascending=False).head(n_top)
+    df_filtrado = df_scores_sentencas[(df_scores_sentencas.indice_comentario.isin(df.index.tolist())) & (df_scores_sentencas.qtde_espacos > 4)]
+    #Adicionando uma margem de 10 sentenças para caso haja alguma repetida no top n
+    df_ordenado_por_score = df_filtrado.sort_values(by='score_positivo',ascending=False).head(n_top+10)
     html = ""
+    sentenca_anterior = ""
+    j = 0
     for i in df_ordenado_por_score.index:
         indice = df_ordenado_por_score['indice_comentario'][i]
         sentenca = df_ordenado_por_score['sentenca'][i]
         atracao = df['atracao'][indice]
         cidade = df['cidade'][indice]
         estado = df['estado'][indice]
-
-        html = html +"* *"+sentenca+"* "+" - **" +atracao+" em "+cidade+"/"+estado +"**\n"
+        if (sentenca != sentenca_anterior):
+            html = html +"* *"+sentenca+"* "+" - **" +atracao+" em "+cidade+"/"+estado +"**\n"
+            j = j + 1
+        if (j == n_top):
+            break
+        sentenca_anterior = sentenca
+        
     st.markdown(html)
 
 def sentencas_mais_negativas_localidade(n_top):
-    df_filtrado = df_scores_sentencas[(df_scores_sentencas.indice_comentario.isin(df.index.tolist())) & (df_scores_sentencas.tam_sentenca > 4)]
-    
-    df_ordenado_por_score = df_filtrado.sort_values(by='score_negativo',ascending=False).head(n_top)
+    df_filtrado = df_scores_sentencas[(df_scores_sentencas.indice_comentario.isin(df.index.tolist())) & (df_scores_sentencas.qtde_espacos > 4)]
+    #Adicionando uma margem de 10 sentenças para caso haja alguma repetida no top n
+    df_ordenado_por_score = df_filtrado.sort_values(by='score_negativo',ascending=False).head(n_top+10)
     html = ""
+    sentenca_anterior = ""
+    j = 0
     for i in df_ordenado_por_score.index:
         indice = df_ordenado_por_score['indice_comentario'][i]
         sentenca = df_ordenado_por_score['sentenca'][i]
         atracao = df['atracao'][indice]
         cidade = df['cidade'][indice]
         estado = df['estado'][indice]
+        if (sentenca != sentenca_anterior):
+            html = html +"* *"+sentenca+"* "+" - **" +atracao+" em "+cidade+"/"+estado +"**\n"
+            j = j + 1
+        if (j == n_top):
+            break
+        sentenca_anterior = sentenca
 
-        html = html + "* *"+sentenca+"* "+" - **" +atracao+" em "+cidade+"/"+estado +"**\n"
     st.markdown(html)
 
 def sentencas_mais_negativas(n_top):
-    df_filtrado = df_scores_sentencas[(df_scores_sentencas.indice_comentario.isin(df.index.tolist())) & (df_scores_sentencas.tam_sentenca > 4)]
-    df_ordenado_por_score = df_filtrado.sort_values(by='score_negativo',ascending=False).head(n_top)
+    df_filtrado = df_scores_sentencas[(df_scores_sentencas.indice_comentario.isin(df.index.tolist())) & (df_scores_sentencas.qtde_espacos > 4)]
+    #Adicionando uma margem de 10 sentenças para caso haja alguma repetida no top n
+    df_ordenado_por_score = df_filtrado.sort_values(by='score_negativo',ascending=False).head(n_top+10)
     html = ""
+    sentenca_anterior = ""
+    i = 0
     for sentenca in df_ordenado_por_score['sentenca']:
-        html = html + "* *"+sentenca+"*\n"
+        if (sentenca != sentenca_anterior):
+            html = html + "* *"+sentenca+"*\n"
+            i = i + 1
+        if (i == n_top):
+            break
+        sentenca_anterior = sentenca
     st.markdown(html)
 
 lista_estados = [
@@ -623,10 +648,12 @@ else:
         row1_1, row1_space1, row1_2, row1_space2, row1_3, row1_space3 = st.columns((1, .1, 1, .1, 1, .1))
         with row1_1:
             TOTAL_COMENTS = len(df)
-            row1_1.metric(label ='Total de comentários',value = TOTAL_COMENTS)
+            row1_1.metric(label ='Total de comentários',value = TOTAL_COMENTS,
+                          delta=porcentagem_total_comentarios(TOTAL_COMENTS), delta_color="off")
         with row1_2:
             TOTAL_USUARIOS = len(pd.DataFrame(df['usuario'].dropna().value_counts()))
-            row1_2.metric(label ='Total de usuários',value = TOTAL_USUARIOS)
+            row1_2.metric(label ='Total de usuários',value = TOTAL_USUARIOS,
+                          delta=porcentagem_total_usuarios(TOTAL_COMENTS), delta_color="off")
         with row1_3:
             MES_MAIS_VISITADO = mes_mais_visitado()
             row1_3.metric(label ='Mês mais visitado',value = MES_MAIS_VISITADO)
@@ -638,16 +665,21 @@ else:
             row2_1.metric(label ='Ano mais visitado',value = ANO_MAIS_VISITADO)
         with row2_2:
             media_caracteres = media_qtde_caracteres(df)
-            row2_2.metric(label ='Média de caracteres por comentário',value = media_caracteres)
+            row2_2.metric(label ='Média de caracteres por comentário',value = media_caracteres,
+                          delta=porcentagem_caracter(media_caracteres))
         with row2_3:
             media_token = media_qtde_token(df)
-            row2_3.metric(label ='Média de tokens por comentário',value = media_token)    
+            row2_3.metric(label ='Média de tokens por comentário',value = media_token,
+                          delta=porcentagem_token(media_token))    
                 
         st.write('')
         row4x_1, row4_space1  = st.columns((1, .1))    
         with row4x_1:
-            row4x_1.metric(label ='Média das Notas',value = round(df['rating'].mean(),2))
+            media_nota_atracao = round(df['rating'].mean(),2)
+            row4x_1.metric(label ='Média das Notas',value = media_nota_atracao,
+                            delta=porcentagem_nota(media_nota_atracao))
         
+        st.write('*Observação: As porcentagens apresentadas são em comparação ao Brasil*')
         st.write('')    
         rowcp_1, espaco = st.columns(( 1, .1))
         with rowcp_1:
