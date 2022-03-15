@@ -7,5 +7,5 @@ https://drive.google.com/drive/folders/1Xtbc6UMpQCFDQSg4iBGnCqixYFGgMgJL?usp=sha
 
 **Para rodar a aplicação:**
 1) Baixe os *datasets* e os coloque no mesmo diretório do arquivo app.py
-2) Instale as bibliotecas do arquivo requeriments.txt
-3) Execute o seguinte comando: streamlit run app.py
+2) Instale as bibliotecas do arquivo requirements.txt
+3) Execute o seguinte comando: **streamlit run app.py**
